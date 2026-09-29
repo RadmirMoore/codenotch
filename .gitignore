@@ -1,11 +1,4 @@
 .DS_Store
-build/
-DerivedData/
-*.xcodeproj
-*.xcworkspace
-!*.xcworkspace/contents.xcworkspacedata
-xcuserdata/
-*.xcuserstate
+.build/
 .swiftpm/
-.agents/
-.forgeguard/
+build/
