@@ -47,7 +47,7 @@ struct ProviderRing: View {
         if let bandOverride { return bandOverride }
         return UsageBand.band(for: usedFraction ?? 0, watchLimit: watchLimit, criticalLimit: criticalLimit)
     }
-    private var sweep: CGFloat { CGFloat(min(max(usedFraction ?? 0, 0), 1)) }
+    private var sweep: CGFloat { CGFloat(1 - min(max(usedFraction ?? 1, 0), 1)) }
     private var localSweep: CGFloat { Self.localSweep(for: localContextFraction) }
     /// The floor is a drawing decision only — the number under the ring and in
     /// the card stays true.
@@ -73,7 +73,7 @@ struct ProviderRing: View {
     private var weeklyBand: UsageBand {
         isBlocked ? .exhausted : UsageBand.band(for: weeklyFraction ?? 0, watchLimit: watchLimit, criticalLimit: criticalLimit)
     }
-    private var weeklySweep: CGFloat { CGFloat(min(max(weeklyFraction ?? 0, 0), 1)) }
+    private var weeklySweep: CGFloat { CGFloat(1 - min(max(weeklyFraction ?? 1, 0), 1)) }
     /// Same fallback rule as `primaryRingColor`, minus `bandOverride` — the weekly ring has none.
     private var weeklyRingColor: Color {
         guard !isBlocked, colorTransitionStyle == .ramp else { return weeklyBand.color(accent: accentColor) }
@@ -484,7 +484,7 @@ struct ProviderReading: View {
     var text: String {
         guard snapshot.hasReading else { return "—" }
         guard let weekly = weeklyReading else { return snapshot.headlineText }
-        return "\(snapshot.headlineText)/\(Percent.text(for: weekly))%"
+        return "\(snapshot.headlineText)/\(Percent.text(for: max(0, 1 - weekly)))%"
     }
 
     /// What the weekly ring draws, when it and its reading are on. The pair

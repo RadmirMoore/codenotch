@@ -136,7 +136,7 @@ struct NotchRootView: View {
                    model.isExpanded,
                    model.hoveredIndex == nil {
                     let index = model.resetAlertIndex(for: resetEvent) ?? 0
-                    let snapshot = model.snapshots[safe: index] ?? model.snapshots.first ?? Fixtures.snapshots().first!
+                    let snapshot = model.snapshots[safe: index] ?? model.snapshots.first ?? ProviderSnapshot(id: "codex", displayName: "Codex", glyph: .openai, fidelity: .official, status: .needsAuth, windows: [])
                     UsageResetCard(
                         event: resetEvent,
                         direction: model.edge.tooltipDirection,
@@ -327,7 +327,7 @@ struct NotchRootView: View {
                     }
                 }
             }
-            
+
             ZStack {
                 // Nothing of ours underneath: a wash of our own would override the
                 // Clear/Tinted choice in Appearance settings, which is the whole
@@ -341,7 +341,7 @@ struct NotchRootView: View {
                 shape.fill(Palette.notch).opacity(glassy ? 0 : 1)
 
             }
-        }   
+        }
             // The glass and the fill both stay mounted so folding keeps
             // animating one shape rather than swapping one view for another
             // mid-flight; the crossfade rides on the unfold animation already

@@ -1100,7 +1100,7 @@ struct TooltipCard: View {
     /// A tap on a session row jumps to that session's terminal — nil leaves
     /// the rows as plain text.
     var onFocusSession: ((pid_t) -> Void)? = nil
-    @AppStorage(Preferences.showUsagePaceKey) private var showUsagePace = false
+    @AppStorage("showUsagePace") private var showUsagePace = false
 
     /// The phase a local model is in, and the queue behind it, for the header.
     /// Ollama's relay only knows thinking; LM Studio's poll names the phase.
@@ -1147,8 +1147,7 @@ struct TooltipCard: View {
                     }
                     if let tokenUsage = snapshot.tokenUsage {
                         CodexUsageSection(usage: tokenUsage, now: now)
-                    } else if let history = snapshot.customUsageHistory {
-                        CodexUsageSection(usage: history.codexUsage, now: now)
+
                     }
                     if let usageDetail = snapshot.usageDetail, usageDetail.hasUsage {
                         DeepSeekUsageDetail(detail: usageDetail, now: now,

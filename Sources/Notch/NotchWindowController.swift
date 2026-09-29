@@ -1953,7 +1953,7 @@ final class NotchWindowController {
         }
         pendingFocus = nil
         // The same exact-tab jump a session row gives, not just the app.
-        Task { _ = await SessionFocus.focus(pid: pending.pid) }
+        // This build does not inspect or focus conversation sessions.
         return true
     }
 

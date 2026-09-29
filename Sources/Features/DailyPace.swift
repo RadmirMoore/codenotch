@@ -63,7 +63,7 @@ enum DailyPace {
     /// with a weekly reading is returned untouched, and so is a snapshot that
     /// already carries the window: the store re-publishes what it archived.
     static func apply(to snapshot: ProviderSnapshot, now: Date) -> ProviderSnapshot {
-        guard ClaudeProfile.isClaude(providerID: snapshot.providerID),
+        guard snapshot.providerID == "claude",
               !snapshot.windows.contains(where: { $0.id == windowID }),
               let weekly = snapshot.windows.first(where: { $0.id == "weekly_all" }),
               let daily = window(weekly: weekly, now: now) else { return snapshot }

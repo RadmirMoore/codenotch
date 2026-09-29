@@ -145,12 +145,7 @@ struct ProviderGlyphView: View {
 
     var body: some View {
         Group {
-            if let customIconFilename,
-               let image = CustomIconStore.loadIcon(filename: customIconFilename) {
-                Image(nsImage: image)
-                    .resizable()
-                    .scaledToFit()
-            } else if let image = NSImage(named: glyph.assetName) {
+            if let image = NSImage(named: glyph.assetName) {
                 Image(nsImage: image)
                     .renderingMode(.template)
                     .resizable()

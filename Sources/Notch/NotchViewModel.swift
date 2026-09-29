@@ -11,7 +11,7 @@ final class NotchViewModel: ObservableObject {
     private var localMetricsEnabled = false
 
     /// The Ollama relay's own id; its readings are keyed by model name.
-    static let ollamaSource = "ollama-local"
+    nonisolated static let ollamaSource = "ollama-local"
 
     func setLocalMetricsEnabled(_ enabled: Bool) {
         localMetricsEnabled = enabled
@@ -55,7 +55,7 @@ final class NotchViewModel: ObservableObject {
     /// Ollama's relay knows a model by the name a client used, with Ollama's
     /// implicit `:latest`; everything else reports by notch cell id.
     static func performanceKey(for snapshot: ProviderSnapshot, model: LocalRuntimeReading.Model) -> String {
-        snapshot.providerID == ollamaSource ? OllamaThinkingStream.modelKey(model.name) : snapshot.id
+        snapshot.providerID == ollamaSource ? model.name : snapshot.id
     }
 
     @Published var thinkingModels: [String: Date] = [:]
@@ -1174,7 +1174,7 @@ final class NotchViewModel: ObservableObject {
                 detail: snapshot.displayName, state: .busy, waitingFor: nil, since: local.since)],
                 queued: local.queued, note: local.note)
         }
-        guard let since = thinkingModels[OllamaThinkingStream.modelKey(model.name)] else { return nil }
+        guard let since = thinkingModels[model.name] else { return nil }
         return ActivitySummary(sessions: [AgentSession(id: snapshot.id, name: L10n.t("Thinking"),
             detail: snapshot.displayName, state: .busy, waitingFor: nil, since: since)])
     }

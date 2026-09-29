@@ -4,7 +4,7 @@ enum AntigravityHeadlineLimit: String, CaseIterable, Identifiable {
     case automatic = "automatic"
     case fiveHour = "5h"
     case weekly = "weekly"
-    
+
     var id: String { rawValue }
 
     var title: String {

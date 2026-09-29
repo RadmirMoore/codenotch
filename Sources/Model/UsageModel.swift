@@ -438,7 +438,7 @@ struct ProviderSnapshot: Identifiable, Equatable {
                 : (localModel?.memoryText ?? "—")
         }
         if headline?.prefersUsedText == true, let usedText = headline?.usedText { return usedText }
-        if let usedFraction { return Percent.text(for: usedFraction) + "%" }
+        if let usedFraction { return Percent.text(for: max(0, 1 - usedFraction)) + "%" }
         if let remaining = headline?.remaining { return LimitWindow.compact(remaining) }
         if let usedText = headline?.usedText { return usedText }
         if let used = headline?.used { return LimitWindow.compact(used) }
@@ -470,40 +470,7 @@ struct ProviderSnapshot: Identifiable, Equatable {
     /// Signing in means something different per provider, so the prompt has to
     /// say which door to knock on.
     private var authPrompt: String {
-        let locale = L10n.locale
-        switch id {
-        case "claude":     return L10n.t("Sign in to Claude Code to read your usage", locale: locale)
-        // A profile is signed in by running Claude Code against its directory,
-        // which is worth saying: plain `claude` signs the default one in.
-        case _ where ClaudeProfile.isClaude(providerID: id):
-            let slug = ClaudeProfile.slug(fromProviderID: id) ?? ""
-            return L10n.t("Sign in to Claude Code in ~/.claude-\(slug) to read your usage", locale: locale)
-        case "cursor":     return L10n.t("Sign in to Cursor in the editor", locale: locale)
-        case "codex":      return L10n.t("Sign in to Codex to read your usage", locale: locale)
-        case "deepseek":   return L10n.t("Sign in to DeepSeek Platform to read your usage", locale: locale)
-        case "qianwenai":  return L10n.t("Sign in to QianwenAI to read your Token Plan usage", locale: locale)
-        case _ where CodexProfile.slug(fromProviderID: id) != nil:
-            let slug = CodexProfile.slug(fromProviderID: id)!
-            return L10n.t("Sign in to Codex in ~/.codex-\(slug) to read your usage", locale: locale)
-        case "gemini":     return L10n.t("Sign in to Antigravity to read your usage", locale: locale)
-        case _ where AntigravityProfile.slug(fromProviderID: id) != nil:
-            let slug = AntigravityProfile.slug(fromProviderID: id)!
-            return L10n.t("Sign in to Antigravity in ~/.gemini/antigravity-\(slug) to read your usage", locale: locale)
-        case "glm":        return L10n.t("Set up a GLM Coding Plan key for a coding tool to read your usage", locale: locale)
-        case "copilot":    return L10n.t("Sign in with GitHub CLI to read your Copilot usage", locale: locale)
-        case "opencode":   return L10n.t("Connect the Go plan in OpenCode to read your usage", locale: locale)
-        case "commandcode": return L10n.t("Sign in with the Command Code app to read your usage", locale: locale)
-        case "kiro":       return L10n.t("Sign in with kiro-cli to read your usage", locale: locale)
-        case "amp":        return L10n.t("Run amp login in Terminal to read your usage", locale: locale)
-        case "apify":      return L10n.t("Run apify login in Terminal, or paste an Apify API token in Settings", locale: locale)
-        case "kilo":       return L10n.t("Sign in with the Kilo CLI to read your usage", locale: locale)
-        // Two Ollamas, and they are stuck for different reasons: the hosted
-        // one wants a key, the local one wants the daemon running.
-        case "ollama":       return L10n.t("Enter an Ollama API key in Settings, or export OLLAMA_API_KEY", locale: locale)
-        case "ollama-local": return L10n.t("Start Ollama to monitor your local models", locale: locale)
-        case "lmstudio":     return L10n.t("Start LM Studio's server to monitor your local models", locale: locale)
-        default:           return L10n.t("Sign in to \(displayName) to read your usage", locale: locale)
-        }
+        return "Откройте настройки и выберите auth.json аккаунта Codex. Если доступ истёк, войдите заново в Codex."
     }
 
     /// What the tooltip says instead of limit rows when there is nothing to show.
