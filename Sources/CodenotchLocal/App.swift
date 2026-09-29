@@ -1,20 +1,72 @@
 import AppKit
+import Combine
 import SwiftUI
 import TokenCounter
 
 @main
-struct CodenotchLocalApp: App {
-    @StateObject private var model = CounterModel()
-
-    var body: some Scene {
-        MenuBarExtra {
-            CounterView(model: model)
-        } label: {
-            Text(model.menuTitle)
-                .monospacedDigit()
-        }
-        .menuBarExtraStyle(.window)
+enum CodenotchLocalApp {
+    @MainActor static func main() {
+        let app = NSApplication.shared
+        let delegate = ApplicationDelegate()
+        app.delegate = delegate
+        app.setActivationPolicy(.regular)
+        withExtendedLifetime(delegate) { app.run() }
     }
+}
+
+/// An explicit window on launch and Finder/Dock reopen. A menu-bar-only
+/// app can be invisible when macOS hides status items behind the notch.
+@MainActor
+final class ApplicationDelegate: NSObject, NSApplicationDelegate {
+    private let model = CounterModel()
+    private var window: NSWindow?
+    private var statusItem: NSStatusItem?
+    private var observation: AnyCancellable?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        let menu = NSMenu()
+        let show = NSMenuItem(title: "Открыть счётчик", action: #selector(showWindow), keyEquivalent: "")
+        show.target = self
+        menu.addItem(show)
+        menu.addItem(.separator())
+        menu.addItem(NSMenuItem(title: "Выход", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        item.button?.title = model.menuTitle
+        item.menu = menu
+        statusItem = item
+        observation = model.objectWillChange.sink { [weak self] _ in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.statusItem?.button?.title = self.model.menuTitle
+            }
+        }
+        showWindow()
+    }
+
+    @objc func showWindow() {
+        if window == nil {
+            let created = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 440, height: 650),
+                                   styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                                   backing: .buffered, defer: false)
+            created.title = "Codenotch Local — токены Codex"
+            created.isReleasedWhenClosed = false
+            created.minSize = NSSize(width: 440, height: 450)
+            created.contentView = NSHostingView(rootView:
+                ScrollView { CounterView(model: model).frame(maxWidth: .infinity) })
+            created.center()
+            window = created
+        }
+        window?.deminiaturize(nil)
+        window?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        showWindow()
+        return true
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }
 
 @MainActor

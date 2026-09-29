@@ -24,6 +24,11 @@ if any(k.startswith("SU") for k in info):
     sys.exit("FAIL: updater metadata present")
 if info.get("CFBundleIdentifier") != "io.github.radmirmoore.codenotch.local":
     sys.exit("FAIL: unexpected app identity")
+executable = app / "Contents/MacOS" / info.get("CFBundleExecutable", "")
+if not executable.is_file() or not os.access(executable, os.X_OK):
+    sys.exit("FAIL: bundle executable is absent or not executable")
+if info.get("LSUIElement", False):
+    sys.exit("FAIL: app must be discoverable in the Dock, not a hidden UI agent")
 package = subprocess.run(["swift", "package", *shlex.split(os.environ.get("SWIFT_FLAGS", "")), "dump-package"], cwd=root,
                          check=True, capture_output=True).stdout
 import json
