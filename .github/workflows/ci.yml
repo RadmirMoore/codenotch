@@ -1,4 +1,4 @@
-name: Local-only verification
+name: Codex widget verification
 on:
   push:
   pull_request:
@@ -11,6 +11,10 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, pinned for reviewable CI
         with:
           persist-credentials: false
+      - run: |
+          XCODE_APP=$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' | sort -V | tail -1)
+          test -n "$XCODE_APP"
+          sudo xcode-select -s "$XCODE_APP/Contents/Developer"
       - run: make test
       - run: make build
 # Deliberately no release publishing, deployment, remote installer, or updater feed.

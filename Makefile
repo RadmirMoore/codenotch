@@ -11,6 +11,8 @@ build:
 	mkdir -p "$(APP)/Contents/MacOS" "$(APP)/Contents/Resources"
 	cp .build/release/CodenotchLocal "$(APP)/Contents/MacOS/CodenotchLocal"
 	cp Resources/Info.plist "$(APP)/Contents/Info.plist"
+	python3 Scripts/package-resources.py
+	xcrun actool Sources/Assets.xcassets --compile "$(APP)/Contents/Resources" --platform macosx --minimum-deployment-target 15.0 --app-icon AppIcon --output-partial-info-plist build/assets-info.plist
 	cp LICENSE "$(APP)/Contents/Resources/LICENSE"
 	codesign --force --options runtime --entitlements Resources/CodenotchLocal.entitlements --sign "$(SIGN_IDENTITY)" "$(APP)"
 	$(MAKE) verify
